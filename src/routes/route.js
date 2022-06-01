@@ -38,7 +38,7 @@ router.get('/test-me', function (req, res) {
     console.log(" ");
 
     //FOR OUTPUT OF PROBLEM 3
-    name = "  functionUp  "
+    let name = "  functionUp  "
     console.log("Before trim the string is: "+name);
     name = trimming;
     console.log("After trim the string is: "+trimming);
