@@ -3,20 +3,20 @@ let name = "  FunctionUp  ";
 let trimmer = function()
 {
     name = name.trim();
-    return(name);
+    console.log(name);
 }
 
 let changeToLowerCase = function()
 {
-    return(name.toLowerCase());
+    console.log(name.toLowerCase());
 }
 
 let changeToUpperCase = function()
 {
-    return(name.toUpperCase())
+    console.log(name.toUpperCase())
 }
 
-module.exports.trimming = trimmer();
-module.exports.lowerCase = changeToLowerCase();
-module.exports.upperCase = changeToUpperCase();
+module.exports.trimming = trimmer;
+module.exports.lowerCase = changeToLowerCase;
+module.exports.upperCase = changeToUpperCase;
 
