@@ -77,4 +77,38 @@ router.get('/films/:filmId',function(req , res){
 
 })
 
+router.get("/sol1", function (req, res){
+    let arr= [1,2,3,5,6,7]
+    let missingNumber =0;
+    let n = arr[arr.length-1];
+    let totalSum = (n*(n+1))/2;
+    let arrSum = 0;
+    arr.forEach(x => {
+        arrSum = arrSum + x;
+    })
+    missingNumber = totalSum - arrSum;
+    res.send({"data": missingNumber})
+}) 
+
+
+router.get("/sol2", function (req, res){
+    let arr= [33,34,35,37,38];
+    let missingNumber =0;
+    n = arr.length;
+    firstNum = arr[0];
+    lastNum = arr[arr.length-1];
+    let totalSum = (n+1)*((firstNum+lastNum)/2);
+    let arrSum = 0;
+    arr.forEach(x => {
+        arrSum = arrSum + x;
+    })
+    missingNumber = totalSum - arrSum;
+    res.send({"data": missingNumber})
+}) 
+
+
+
+
+
+
 module.exports = router;
