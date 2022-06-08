@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bookController = require("../controllers/BookController")
+const authorController = require("../controllers/AuthorController")
 
 
 router.get("/test-me", function (req, res) {
@@ -8,10 +9,9 @@ router.get("/test-me", function (req, res) {
 })
 
 router.post("/createBook",bookController.createBook)
-router.get("/getBooks",bookController.bookList)
-router.post("/getBooksInYear",bookController.getBooksInYear)
-router.post("/getPerticularBooks",bookController.getParticularBooks)
-router.get("/getXINRBooks",bookController.getXINRBooks)
-router.get("/getRandomBooks",bookController.getRandomBooks)
+router.post("/createAuthor",authorController.createAuthor)
 
+router.get("/booksByChetanBhagat",bookController.bookWrittenBy)
+router.get("/authorOf2States",bookController.authorOf2States)
+router.get("/costBet",bookController.costBetw)
 module.exports = router;
