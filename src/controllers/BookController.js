@@ -1,49 +1,60 @@
 const { request } = require("express")
 const bookModel = require("../models/bookModel")
+const authorModel = require("../models/authorModel")
 
 const createBook = async function(req, res)
 {
     let data= req.body
-    let savedData = await bookModel.create(data)
-    res.send({msg: savedData})
+    let savedBook = await bookModel.create(data)
+    res.send({msg: savedBook})
 }
 
-const bookList = async function(req, res)
+const bookWrittenBy = async function(req, res)
 {
-    let allBooks = await bookModel.find().select({bookName:1,aurhorName:1,_id:0})
-    res.send({msg: allBooks})
+    let idOfChetan = await authorModel.find({author_name:"Chetan Bhagat"}).select({author_id:1})
+    let bookByChetan =await bookModel.find({author_id:idOfChetan[0].author_id} )
+    res.send({msg:bookByChetan})
 }
 
-const getBooksInYear = async function(req, res)
+const authorOf2States = async function(req, res)
 {
-    let request = req.body
-    let getYear = Object.values(request)
-    let booksInYear = await bookModel.find({year: getYear}).select({bookName:1,_id:0})
-    res.send({msg: booksInYear})
+    let book = await bookModel.findOneAndUpdate(
+        {
+            name: "Two states"
+        },
+        {
+            $set:{price:100} 
+        },
+        {
+            new:true
+        }
+    )
+    let authorName = await authorModel.find({author_id:book.author_id}).select({author_name:1,_id:0})
+    let price  = book.price;
+    res.send({msg: authorName[0],price})
 }
 
-const getParticularBooks = async function(req, res)
+const costBetw = async function(req,res)
 {
-    let request = req.body
-    let desiredOutput = await bookModel.find(request)
-    res.send({msg: desiredOutput})
+    let booksBetween = await bookModel.find({price:{$gte:50,$lte:100}}).select({author_id:1})
+    // let arr = []
+    // booksBetween.forEach(x => {
+    //     arr.push(x.author_id)
+    // })
+
+    let allAuthor =[];
+    for(let i =0;i<booksBetween.length;i++)
+    {
+        allAuthor.push(await authorModel.findOne({author_id:booksBetween[i].author_id}).select({author_name:1, _id:0})) 
+    }
+     
+    
+    res.send(allAuthor);
+    
 }
 
-const getXINRBooks = async function(req, res)
-{
-    let booksWithPrices = await bookModel.find({$or:[{"price.indPrice":100},{"price.indPrice":200},{"price.indPrice":500}]})
-    res.send({msg: booksWithPrices})
 
-}
-
-const getRandomBooks = async function(req, res)
-{
-    let randomBooks = await bookModel.find({$or:[{stockAvailable:true},{totalPages:{$gt:500}}]})
-    res.send({msg: randomBooks})
-}
 module.exports.createBook = createBook
-module.exports.bookList = bookList
-module.exports.getBooksInYear = getBooksInYear
-module.exports.getParticularBooks = getParticularBooks
-module.exports.getXINRBooks = getXINRBooks
-module.exports.getRandomBooks = getRandomBooks
+module.exports.bookWrittenBy = bookWrittenBy
+module.exports.authorOf2States = authorOf2States
+module.exports.costBetw = costBetw

@@ -8,7 +8,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-mongoose.connect("mongodb+srv://spacespider:admin@cluster0.0ps1ymn.mongodb.net/Rosan-DB?retryWrites=true&w=majority", {
+mongoose.connect("mongodb+srv://spacespider:admin@cluster0.0ps1ymn.mongodb.net/Rosan-bookAuthorassignment-DB?retryWrites=true&w=majority", {
     useNewUrlParser: true
 })
 .then( () => console.log("MongoDb is connected"))
