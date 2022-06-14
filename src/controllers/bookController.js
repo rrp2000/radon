@@ -4,8 +4,8 @@ const publisherModel = require("../models/publisherModel")
 
 const createBook= async function (req, res) {
     let book = req.body
-    let authorId = await authorModel.find({_id:book.author})
-    let publisherId = await publisherModel.find({_id:book.publisher})
+    let authorId = await authorModel.findById(book.author)
+    let publisherId = await publisherModel.find(book.publisher)
     if(!book.author&& !book.publisher)
     {
         res.send("ERROR: author and publisher data is required.")
@@ -20,7 +20,7 @@ const createBook= async function (req, res) {
     }
     else
     {
-        if(authorId.length === 0 && publisherId.length === 0)
+        if(!authorId && !publisherId)
         {
             res.send("ERROR: Enter correct authorId and publisherId.")
         }
@@ -49,32 +49,41 @@ const getAllBooks= async function (req, res) {
 }
 
 
-// const bookOper = async function(req, res)
-// {
-//    let findBooks = await publisherModel.find({name:{$in:['Penguin','HarperCollins']}}).select({_id:1})
-//    let books = await bookModel.find().populate('publisher')
-//    let finalBooks;
-//    for(let i = 0; i<books.length; i++)
-//    {
-//        for(let j = 0; j<findBooks; j++)
-//        {
-//            if(books[i].author._id == findBooks[j]._id)
-//            {
-//                finalBooks = await bookModel.findOneAndUpdate({
-//                 "books[i].author._id" : "findBooks[j]._id"
-//                },
-//                {
-//                    $set:{"books[i].isHardCover": true}
-//                },
-//                {
-//                    new:true,upsert:true
-//                }
-//                )
-//            }
-//        }
-//    }
-//    res.send(finalBooks)
-// }
+const bookOper = async function(req, res)
+{
+    const publisherId = await publisherModel.find({$or: 
+        [{name:"Penguin"},{name:"HarperCollins"}]
+    }).select({_id:1})
+
+    const hardCoverUpdate = await bookModel.updateMany(
+        {
+            publisher:publisherId
+        },
+        {
+            $set:{isHardCover: true}
+        },
+        {
+            new: true, upsurt: true
+        }
+    )
+    const authors  = await authorModel.find({rating:{$gt:3.5}}).select({_id:1})
+
+    const updateBookPrice = await bookModel.updateMany(
+        {
+            author:authors
+        },
+        {
+            $inc:{price:10}
+        },
+        {
+            new:true
+        }
+    )
+    res.send(updateBookPrice)
+
+
+}
+
 module.exports.createBook= createBook
 module.exports.getAllBooks= getAllBooks
-// module.exports.bookOper = bookOper
+module.exports.bookOper = bookOper
