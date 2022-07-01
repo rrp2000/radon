@@ -35,7 +35,7 @@ const createCollege = async function (req, res) {
         if (!data.fullName) return res.status(400).send({ status: false, message: "fullName is required" })
         if (!data.logoLink) return res.status(400).send({ status: false, message: "logoLink is required" })
 
-        if(typeof data.name == 'number') return res.status(400).send({status:false, message:"name can't contain number"})
+        // if(typeof data.name == 'number') return res.status(400).send({status:false, message:"name can't contain number"})
        
         if (!isValid(data.name)) {return res.status(400).send({ status: false, message: "Please provide valid college name" });}
         
@@ -49,7 +49,7 @@ const createCollege = async function (req, res) {
         //checking for name and fullname must be string
         if(isVerifyString(data.name)) return res.status(400).send({status:false, message:"name can't contain numbers"})
         if(isVerifyString(data.fullName)) return res.status(400).send({status:false, message:"full name can't contain numbers"})
-        if(typeof data.logoLink == 'number') return res.status(400).send({status:false, message:"Please provide valid url"})
+        // if(typeof data.logoLink == 'number') return res.status(400).send({status:false, message:"Please provide valid url"})
         
 
 

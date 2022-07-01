@@ -80,7 +80,6 @@ const createInterns = async function (req, res) {
         
         if(typeof data.collegeName == 'number') return res.status(400).send({status:false, message:"collegeName can't contain number"})
 
-        data.collegeName = (data.collegeName).toUpperCase()
         
         let collegeData = await collegeModel.findOne({name:data.collegeName})
         if(!collegeData) return res.status(404).send({status:false,message:`${data.collegeName} college doesn't exist`})
