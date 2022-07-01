@@ -27,8 +27,9 @@ const createCollege = async function (req, res) {
         // // Body Validation
         if (!isBodyExist(data)) {return res.status(400).send({ status: false, message: "Please provide college details" });}
 
-        // Destructuring body
-        const { name, fullName, logoLink } = data;
+        Object.keys(data).forEach(x => {
+            data[x] = data[x].trim()
+        })
        
         if (!data.name) return res.status(400).send({ status: false, message: "name is required" })
         if (!data.fullName) return res.status(400).send({ status: false, message: "fullName is required" })
