@@ -57,9 +57,9 @@ const createCollege = async function (req, res) {
         let checkName = await collegeModel.findOne({ name: data.name })
         if (checkName) return res.status(400).send({ status:false,message: "College Name already exist" })
 
-        if (!isValid(fullName)) {return res.status(400).send({status: false,message: "Please provide valid fullName of the college",});}
+        if (!isValid(data.fullName)) {return res.status(400).send({status: false,message: "Please provide valid fullName of the college",});}
 
-        if (!isValid(logoLink)) {return res.status(400).send({ status: false, message: "Please provide valid url" });}
+        if (!isValid(data.logoLink)) {return res.status(400).send({ status: false, message: "Please provide valid url" });}
 
         // Creating the College 
 
