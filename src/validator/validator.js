@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const authorModel = require("../Model/authorModel");
 
 
 const isValidObjectId = function (objectId) {
@@ -87,11 +86,6 @@ const checker = function (data) {
     const pass = "password must not have spaces.   "
     rdata = rdata + pass;
   }
-
-  // else if (!/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(data.password)) {
-  //   const pass = "password must have a special character present.   "
-  //   rdata = rdata + pass;
-  // };
 
   return rdata
 

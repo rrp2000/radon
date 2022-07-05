@@ -1,6 +1,9 @@
-const authorModel = require("../Model/authorModel")
+const authorModel = require("../model/authorModel")
 const validate = require("../validator/validator")
 const jwt=require("jsonwebtoken")
+
+
+// =====================Create Author=========================
 
 const createAuthor = async function (req, res) {
     try {
@@ -23,6 +26,9 @@ const createAuthor = async function (req, res) {
         res.status(500).send({status:false, msg: err.message })
     }
 }
+
+//===========================Login===============================
+
 const loginAuthor = async function (req, res) {
     try {
         let authorEmail = req.body.email;
@@ -40,7 +46,6 @@ const loginAuthor = async function (req, res) {
                     member: "chetan"
                 }, "Roshan"
             );
-            res.setHeader("x-api-token",token)
             res.status(200).send({ status:true,data:{token: token }});
         };
         if (!author) {

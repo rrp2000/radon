@@ -1,7 +1,9 @@
-const blogModel = require("../Model/blogModel")
-const authorModel = require("../Model/authorModel")
+const blogModel = require("../model/blogModel")
+const authorModel = require("../model/authorModel")
 const validator = require("../validator/validator")
 const validate = require("../validator/validator")
+
+//=====================create blogs========================
 
 
 const createBlog = async function (req, res) {
@@ -16,20 +18,27 @@ const createBlog = async function (req, res) {
         if(!data.authorId||data.authorId===undefined){
             res.status(400).send({status:false,msg:"authorId cant be empty."})
         }
-        data.authorId=data.authorId.trim();
+        const authorIdFromToken = req.authorId
+        if(authorIdFromToken!= data.authorId.toString()){
+            return res.status(403).send({status:false,msg:"You are not allowed to modify."})
+        }
+        
         let authorId = await authorModel.find({ _id: data.authorId })
-       
-        if (authorId.length) {
-            let savedData = await blogModel.create(data)
-            res.status(201).send({ status:true,data: savedData })
+        if(data.isPublished===true){
+            data.publishedAt = new Date()
         }
         if (!authorId.length) {
             res.status(400).send({ status:false,msg: "authorid is not valid." })
+        }
+        else{
+            let savedData = await blogModel.create(data)
+            res.status(201).send({ status:true,data: savedData })
         }
     }
     catch (err) { res.status(500).send({status:false,msg:err.message}) }
 }
 
+//===========================getBlogs==============================
 
 const getBlog = async function (req, res) {
     try {
@@ -74,9 +83,12 @@ const getBlog = async function (req, res) {
     }
 }
 
+//============================Update blogs==============================
+
 const updateBlog = async function (req, res) {
 
     try {
+        
         let blogId = req.params.blogId;
         if (!validator.isValidObjectId(blogId)) {
             return res.status(400).send({ status: false, msg: `BlogId is invalid.` });
@@ -85,6 +97,10 @@ const updateBlog = async function (req, res) {
 
         if (Object.keys(user) === 0 || user.isDeleted === true) {
             return res.status(404).send({ status: false, msg: " no such data found" });
+        }
+        const authorIdFromToken = req.authorId
+        if(authorIdFromToken!= user.authorId.toString()){
+            return res.status(403).send({status:false,msg:"You are not allowed to modify."})
         }
 
         let userData = req.body;
@@ -116,6 +132,7 @@ const updateBlog = async function (req, res) {
     }
 };
 
+//================================delete blog=================================
 
 const deleteBlogById = async function (req, res) {
 
@@ -125,13 +142,18 @@ const deleteBlogById = async function (req, res) {
         if (!validator.isValidObjectId(id)) {
             return res.status(400).send({ status: false, msg: `BlogId is invalid.` });
         }
-        let Blog = await blogModel.findOne({ _id: id });
+        let blog = await blogModel.findOne({ _id: id });
 
-        if (!Blog) {
+        if (!blog) {
           return res.status(404).send({ status: false, msg: "No such blog found" });
         }
+
+        const authorIdFromToken = req.authorId
+        if(authorIdFromToken!= blog.authorId.toString()){
+            return res.status(403).send({status:false,msg:"You are not allowed to modify."})
+        }
     
-        if (Blog.isDeleted == false) {
+        if (blog.isDeleted == false) {
           let Update = await blogModel.findOneAndUpdate(
             { _id: id },
             { isDeleted: true, deletedAt: Date() },
@@ -148,26 +170,54 @@ const deleteBlogById = async function (req, res) {
         res.status(500).send({ status: false, msg: err.message });
     }
 }
+
+
+//=============================delete blogs=================================
+
+
 const deleteByQuery = async function (req, res) {
-    try {
-        let conditions = req.query
-        conditions.isDeleted = false
 
-        if (!validator.isValidRequestBody(conditions)) {
-            return res.status(400).send({ status: false, msg: "Invalid request parameters. Please provide query details" });
+        try{
+    
+            const filterQuery = req.query
+            filterQuery.isDeleted=false
+            if (filterQuery.tags) {
+                if (filterQuery.tags.includes(",")) {
+                    let tagArray = filterQuery.tags.split(",").map(String).map(x => x.trim())
+                    filterQuery.tags = { $all: tagArray }
+                }
+            }
+
+            if (filterQuery.subcategory) {
+                if (filterQuery.subcategory.includes(",")) {
+                   let subcatArray = filterQuery.subcategory.split(",").map(String).map(x => x.trim())
+                    filterQuery.subcategory = { $all: subcatArray }
+                }
+            }
+            
+            const authorIdFromToken = req.authorId
+
+            const blogs = await blogModel.find(filterQuery);
+            if(blogs.length===0) return res.status(404).send({status:false, msg: 'No matching blogs found'})
+            const idsOfBlogsToDelete = []
+            for(let i = 0;i<blogs.length;i++){
+                if(blogs[i].authorId.toString() === authorIdFromToken){
+                    idsOfBlogsToDelete.push(blogs[i]._id.toString())
+                }
+            }
+            console.log(idsOfBlogsToDelete)
+            if(idsOfBlogsToDelete.length===0){
+                return res.status(400).send({status:false, message: 'No blogs found'})
+            }
+    
+            const blog = await blogModel.updateMany({_id: {$in: idsOfBlogsToDelete}}, {$set: {isDeleted: false, deletedAt: new Date()}})
+            res.status(200).send({status: true, message: blog})
+            
+        }catch(error){
+            res.status(500).send({status:false,msg:error.message})
         }
-        let data = await blogModel.find(conditions);
+    };
 
-        if (data.length==0) {
-            return res.status(404).send({ status: false, msg: "no such data exists" })
-        }
-        let Update = await blogModel.updateMany(conditions, { $set: { isDeleted: false, deletedAt: new Date() } }, { new: true })
-        res.status(200).send({ status: true, data: Update })
-    } catch (err) {
-        res.status(500).send({ status: false, msg: err.message });
-    }
-
-}
 
 
 module.exports = { createBlog, createBlog, getBlog, deleteBlogById, deleteByQuery, updateBlog };
